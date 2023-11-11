@@ -57,13 +57,7 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: Artifacts
-        path: artifacts
-
-    - name: Copy output
-      run: cp artifacts/* . -r
-
-    - name: Delete artifacts
-      run: rm -rf artifacts
+        path: .
 
     - uses: stefanzweifel/git-auto-commit-action@v5
       with:
