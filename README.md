@@ -5,7 +5,8 @@
 
 Fetch up-to-date database:
 ```js
-let db = await fetch(`https://raw.github.com/qt-kaneko/MALibria/db/mapped.json`);
+let dbResponse = await fetch(`https://raw.github.com/qt-kaneko/MALibria/db/mapped.json`);
+let db = await dbResponse.json();
 ```
 
 To get My Anime List/Shikimori ID from Anilibria ID:
