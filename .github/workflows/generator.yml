@@ -1,0 +1,71 @@
+name: Run generator
+
+on:
+  workflow_dispatch: # Possibility for manual run
+  schedule:
+  - cron: "23 18 * * *" # Run the workflow every 18:23 UTC
+  push:
+    branches:
+      - 'main' # Run the workflow on push to main branch
+
+# Workflow configuration
+env:
+  SOURCE_BRANCH: main
+  OUTPUT_BRANCH: db
+  OUTPUT_PATH: mapped.json # Relative to WORKING_DIRECTORY
+  COMMIT_MESSAGE: Automatic data update
+  WORKING_DIRECTORY: bin/Release/net7.0 # Relative to the repository root
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{env.SOURCE_BRANCH}}
+
+    - name: Setup .NET 7.0
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0
+
+    - name: Create working directory
+      run: mkdir -p ${{env.WORKING_DIRECTORY}}
+
+    - name: Build and run
+      working-directory: ${{env.WORKING_DIRECTORY}}
+      run: dotnet run -c Release --project ${{github.workspace}}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Artifacts
+        path: ${{env.WORKING_DIRECTORY}}/${{env.OUTPUT_PATH}}
+
+  commit-output:
+    needs: build-and-run
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{env.OUTPUT_BRANCH}}
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: Artifacts
+        path: artifacts
+
+    - name: Copy output
+      run: cp artifacts/* . -r
+
+    - name: Delete artifacts
+      run: rm -rf artifacts
+
+    - uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: ${{env.COMMIT_MESSAGE}}
+        branch: ${{env.OUTPUT_BRANCH}}
