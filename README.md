@@ -1,3 +1,6 @@
+# MALibria
+> The database is updated once every day.
+
 ## How to use?
 
 Fetch up-to-date database:
