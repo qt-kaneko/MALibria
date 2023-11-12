@@ -43,13 +43,27 @@ static partial class Program
 
   static async Task<IEnumerable<Anilibria.Title>> FetchAnilibriaTitles()
   {
-    var anilibriaRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.anilibria.tv/v3/title/search/advanced?query=exists({player.alternative_player})&filter=id,player.alternative_player&items_per_page=999999");
-    var anilibriaResponse = await _http.SendAsync(anilibriaRequest);
-    var anilibriaText = await anilibriaResponse.Content.ReadAsStringAsync();
-    var anilibriaTitles = JsonSerializer.Deserialize<Anilibria.Response>(anilibriaText)!
-                                        .List;
+    var aggrefateException = new AggregateException();
+    for (var attempt = 1; attempt <= 10; ++attempt)
+    {
+      try
+      {
+        var anilibriaRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.anilibria.tv/v3/title/search/advanced?query=exists({player.alternative_player})&filter=id,player.alternative_player&items_per_page=999999");
+        var anilibriaResponse = await _http.SendAsync(anilibriaRequest);
+        var anilibriaText = await anilibriaResponse.Content.ReadAsStringAsync();
+        Console.WriteLine($"[{attempt}] Anilibria response: {anilibriaText.Substring(0, 75)}...");
+        var anilibriaTitles = JsonSerializer.Deserialize<Anilibria.Response>(anilibriaText)!
+                                            .List;
 
-    return anilibriaTitles;
+        return anilibriaTitles;
+      }
+      catch (Exception ex)
+      {
+        aggrefateException = new AggregateException(Enumerable.Append(aggrefateException.InnerExceptions, ex));
+      }
+    }
+
+    throw aggrefateException;
   }
 
   static async Task<IEnumerable<Kodik.Result>> FetchKodikTitles()
