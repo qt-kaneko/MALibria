@@ -43,7 +43,7 @@ static partial class Program
 
   static async Task<IEnumerable<Anilibria.Title>> FetchAnilibriaTitles()
   {
-    var aggrefateException = new AggregateException();
+    var aggregateException = new AggregateException();
     for (var attempt = 1; attempt <= 10; ++attempt)
     {
       try
@@ -59,11 +59,11 @@ static partial class Program
       }
       catch (Exception ex)
       {
-        aggrefateException = new AggregateException(Enumerable.Append(aggrefateException.InnerExceptions, ex));
+        aggregateException = new AggregateException(Enumerable.Append(aggregateException.InnerExceptions, ex));
       }
     }
 
-    throw aggrefateException;
+    throw aggregateException;
   }
 
   static async Task<IEnumerable<Kodik.Result>> FetchKodikTitles()
