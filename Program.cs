@@ -59,7 +59,7 @@ static partial class Program
       }
       catch (Exception ex)
       {
-        aggregateException = new AggregateException(Enumerable.Append(aggregateException.InnerExceptions, ex));
+        aggregateException = new AggregateException(aggregateException.InnerExceptions.Append(ex));
       }
     }
 
