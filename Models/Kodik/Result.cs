@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace MALibria.Kodik;
+namespace MALibria.Models.Kodik;
 
 struct Result
 {

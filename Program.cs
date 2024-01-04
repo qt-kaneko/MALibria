@@ -1,9 +1,19 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using MALibria.Extensions;
+using MALibria.Models;
 
-namespace MALibria.Kodik;
+using Anilibria = MALibria.Models.Anilibria;
+using Kodik = MALibria.Models.Kodik;
+
+namespace MALibria;
 
 static partial class Program
 {
@@ -16,11 +26,16 @@ static partial class Program
 
   static async Task Main()
   {
+    var manuallyMappedTitles = ReadManullyMappedTitles();
+
     Console.WriteLine("Downloading Anilibria database...");
-    var anilibriaTitles = await FetchAnilibriaTitles();
+    (var anilibriaTitles, var anilibriaJson) = await FetchAnilibriaTitles();
+    File.WriteAllText("anilibria.json", anilibriaJson);
 
     Console.WriteLine("Downloading Kodik database...");
-    var kodikTitles = await FetchKodikTitles();
+    (var kodikTitles, var kodikSerialsJson, var kodikFilmsJson) = await FetchKodikTitles();
+    File.WriteAllText("kodik-serials.json", kodikSerialsJson);
+    File.WriteAllText("kodik-films.json", kodikFilmsJson);
 
     Console.WriteLine("Processing...");
     var mapped = anilibriaTitles.SelectWhere(anilibriaTitle => {
@@ -36,26 +51,37 @@ static partial class Program
         AnilibriaId = anilibriaTitle.Id,
         MyAnimeListId = int.Parse(kodikTitle.ShikimoriId)
       };
-    }).ToArray();
+    }).Union(manuallyMappedTitles)
+      .ToArray();
 
     File.WriteAllText("mapped.json", JsonSerializer.Serialize(mapped));
   }
 
-  static async Task<IEnumerable<Anilibria.Title>> FetchAnilibriaTitles()
+  static Title[] ReadManullyMappedTitles()
+  {
+    var titlesString = File.ReadAllText("ManuallyMapped.json");
+    var titles = JsonSerializer.Deserialize<Title[]>(titlesString)!;
+
+    return titles;
+  }
+
+  static async Task<(IEnumerable<Anilibria.Title>, string json)> FetchAnilibriaTitles()
   {
     var aggregateException = new AggregateException();
     for (var attempt = 1; attempt <= 10; ++attempt)
     {
       try
       {
-        var anilibriaRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.anilibria.tv/v3/title/search/advanced?query=exists({player.alternative_player})&filter=id,player.alternative_player&items_per_page=999999");
-        var anilibriaResponse = await _http.SendAsync(anilibriaRequest);
-        var anilibriaText = await anilibriaResponse.Content.ReadAsStringAsync();
-        Console.WriteLine($"[{attempt}] Anilibria response: {anilibriaText.Substring(0, 75)}...");
-        var anilibriaTitles = JsonSerializer.Deserialize<Anilibria.Response>(anilibriaText)!
-                                            .List;
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.anilibria.tv/v3/title/search/advanced?query=exists({player.alternative_player})&filter=id,player.alternative_player&items_per_page=999999");
+        var response = await _http.SendAsync(request);
+        var responseString = await response.Content.ReadAsStringAsync();
 
-        return anilibriaTitles;
+        Console.WriteLine($"[{attempt}] Anilibria response: {responseString.Substring(0, 75)}...");
+
+        var titles = JsonSerializer.Deserialize<Anilibria.Response>(responseString)!
+                                   .List;
+
+        return (titles, responseString);
       }
       catch (Exception ex)
       {
@@ -66,24 +92,25 @@ static partial class Program
     throw aggregateException;
   }
 
-  static async Task<IEnumerable<Kodik.Result>> FetchKodikTitles()
+  static async Task<(IEnumerable<Kodik.Result>, string serialsJson, string filmsString)>
+    FetchKodikTitles()
   {
-    var kodikSerialsRequest = new HttpRequestMessage(HttpMethod.Get, "https://dumps.kodik.biz/serials/anime-serial.json");
-    var kodikSerialsResponse = _http.SendAsync(kodikSerialsRequest);
+    var serialsRequest = new HttpRequestMessage(HttpMethod.Get, "https://dumps.kodik.biz/serials/anime-serial.json");
+    var serialsResponse = _http.SendAsync(serialsRequest);
 
-    var kodikFilmsRequest = new HttpRequestMessage(HttpMethod.Get, "https://dumps.kodik.biz/films/anime.json");
-    var kodikFilmsResponse = _http.SendAsync(kodikFilmsRequest);
+    var filmsRequest = new HttpRequestMessage(HttpMethod.Get, "https://dumps.kodik.biz/films/anime.json");
+    var filmsResponse = _http.SendAsync(filmsRequest);
 
-    await Task.WhenAll(kodikSerialsResponse, kodikFilmsResponse);
+    await Task.WhenAll(serialsResponse, filmsResponse);
 
-    var kodikSerialsText = await kodikSerialsResponse.Result.Content.ReadAsStringAsync();
-    var kodikSerials = JsonSerializer.Deserialize<Kodik.Result[]>(kodikSerialsText)!;
+    var serialsString = await serialsResponse.Result.Content.ReadAsStringAsync();
+    var serials = JsonSerializer.Deserialize<Kodik.Result[]>(serialsString)!;
 
-    var kodikFilmsText = await kodikSerialsResponse.Result.Content.ReadAsStringAsync();
-    var kodikFilms = JsonSerializer.Deserialize<Kodik.Result[]>(kodikFilmsText)!;
+    var filmsString = await filmsResponse.Result.Content.ReadAsStringAsync();
+    var films = JsonSerializer.Deserialize<Kodik.Result[]>(filmsString)!;
 
-    var kodikTitles = Enumerable.Concat(kodikSerials, kodikFilms);
+    var titles = Enumerable.Concat(serials, films);
 
-    return kodikTitles;
+    return (titles, serialsString, filmsString);
   }
 }

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace MALibria.Anilibria;
+namespace MALibria.Models.Anilibria;
 
 struct Player
 {

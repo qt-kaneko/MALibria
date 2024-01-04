@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace MALibria.Anilibria;
+namespace MALibria.Models.Anilibria;
 
 struct Response
 {
