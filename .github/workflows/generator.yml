@@ -3,7 +3,7 @@ name: Run generator
 on:
   workflow_dispatch: # Possibility for manual run
   schedule:
-  - cron: "23 18 * * *" # Run the workflow every 18:23 UTC
+  - cron: "23 19 * * *" # Run the workflow every 19:23 UTC
   push:
     branches:
       - 'main' # Run the workflow on push to main branch
