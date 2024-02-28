@@ -76,7 +76,7 @@ static partial class Program
         var response = await _http.SendAsync(request);
         var responseString = await response.Content.ReadAsStringAsync();
 
-        Console.WriteLine($"[{attempt}] Anilibria response: {responseString.Substring(0, 75)}...");
+        Console.WriteLine($"[{attempt}] Anilibria response: {responseString.Substring(0, Math.Clamp(75, int.MinValue, responseString.Length))}...");
 
         var titles = JsonSerializer.Deserialize<Anilibria.Response>(responseString)!
                                    .List;
