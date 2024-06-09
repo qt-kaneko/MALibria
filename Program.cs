@@ -21,8 +21,10 @@ static partial class Program
   private static partial Regex _kodikIdRegex();
 
   static HttpClient _http = new(new HttpClientHandler() {
-    AutomaticDecompression = System.Net.DecompressionMethods.All
-  });
+    AutomaticDecompression = System.Net.DecompressionMethods.All,
+  }) {
+    Timeout = TimeSpan.FromMinutes(5)
+  };
 
   static async Task Main()
   {
