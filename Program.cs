@@ -51,10 +51,12 @@ static partial class Program
 
       return (Title?)new Title() {
         AnilibriaId = anilibriaTitle.Id,
-        MyAnimeListId = int.Parse(kodikTitle.ShikimoriId)
+        MyAnimeListId = int.Parse(kodikTitle.ShikimoriId),
+        Episodes = anilibriaTitle.Player.Episodes.Last ?? -1
       };
-    }).Union(manuallyMappedTitles)
-      .ToArray();
+    })
+    .Union(manuallyMappedTitles)
+    .ToArray();
 
     File.WriteAllText("mapped.json", JsonSerializer.Serialize(mapped));
   }
@@ -74,7 +76,7 @@ static partial class Program
     {
       try
       {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.anilibria.tv/v3/title/search/advanced?query=exists({player.alternative_player})&filter=id,player.alternative_player&items_per_page=999999");
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.anilibria.tv/v3/title/search/advanced?query=exists({player.alternative_player})&filter=id,player.alternative_player,player.episodes.last&items_per_page=999999");
         var response = await _http.SendAsync(request);
         var responseString = await response.Content.ReadAsStringAsync();
 

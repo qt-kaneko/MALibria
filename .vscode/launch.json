@@ -9,9 +9,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/bin/Debug/net8.0/MALibria.dll",
+      "program": "${workspaceFolder}/bin/Debug/net9.0/MALibria.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/bin/Debug/net8.0",
+      "cwd": "${workspaceFolder}/bin/Debug/net9.0",
       "console": "internalConsole",
       "stopAtEntry": false
     }

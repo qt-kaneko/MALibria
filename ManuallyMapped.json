@@ -1,15 +1,15 @@
 [
-  {"anilibria_id": 8586, "myanimelist_id": 14719},
-  {"anilibria_id": 9159, "myanimelist_id": 43608},
-  {"anilibria_id": 8604, "myanimelist_id": 40591},
-  {"anilibria_id": 8041, "myanimelist_id": 37999},
-  {"anilibria_id": 9459, "myanimelist_id": 52198},
-  {"anilibria_id": 9045, "myanimelist_id": 43609},
-  {"anilibria_id": 4575, "myanimelist_id": 34933},
-  {"anilibria_id": 8431, "myanimelist_id": 10620},
-  {"anilibria_id": 8031, "myanimelist_id": 37086},
-  {"anilibria_id": 3465, "myanimelist_id": 33487},
-  {"anilibria_id": 7433, "myanimelist_id": 37430},
-  {"anilibria_id": 5495, "myanimelist_id": 14713},
-  {"anilibria_id": 9527, "myanimelist_id": 13601}
+  {"anilibria_id": 8586, "myanimelist_id": 14719, "episodes": -1},
+  {"anilibria_id": 9159, "myanimelist_id": 43608, "episodes": -1},
+  {"anilibria_id": 8604, "myanimelist_id": 40591, "episodes": -1},
+  {"anilibria_id": 8041, "myanimelist_id": 37999, "episodes": -1},
+  {"anilibria_id": 9459, "myanimelist_id": 52198, "episodes": -1},
+  {"anilibria_id": 9045, "myanimelist_id": 43609, "episodes": -1},
+  {"anilibria_id": 4575, "myanimelist_id": 34933, "episodes": -1},
+  {"anilibria_id": 8431, "myanimelist_id": 10620, "episodes": -1},
+  {"anilibria_id": 8031, "myanimelist_id": 37086, "episodes": -1},
+  {"anilibria_id": 3465, "myanimelist_id": 33487, "episodes": -1},
+  {"anilibria_id": 7433, "myanimelist_id": 37430, "episodes": -1},
+  {"anilibria_id": 5495, "myanimelist_id": 14713, "episodes": -1},
+  {"anilibria_id": 9527, "myanimelist_id": 13601, "episodes": -1}
 ]
