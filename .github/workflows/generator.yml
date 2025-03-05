@@ -14,7 +14,7 @@ env:
   OUTPUT_BRANCH: db
   OUTPUT_PATH: mapped.json # Relative to WORKING_DIRECTORY
   COMMIT_MESSAGE: Automatic data update
-  WORKING_DIRECTORY: bin/Release/net8.0 # Relative to the repository root
+  WORKING_DIRECTORY: bin/Release/net9.0 # Relative to the repository root
 
 jobs:
   build-and-run:
@@ -25,10 +25,10 @@ jobs:
       with:
         ref: ${{env.SOURCE_BRANCH}}
 
-    - name: Setup .NET 8.0
+    - name: Setup .NET 9.0
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0
+        dotnet-version: 9.0
 
     - name: Create working directory
       run: mkdir -p ${{env.WORKING_DIRECTORY}}
